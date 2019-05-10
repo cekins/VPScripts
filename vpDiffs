@@ -2,7 +2,8 @@
 
 # TODO: desc
 
-source vpFunctions.sh
+source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/vpFunctions.sh"
+
 
 # Get screenshot directory
 ssDir=$(getScreenshotDir)
