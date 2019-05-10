@@ -2,7 +2,7 @@
 
 # TODO: desc
 
-libDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/lib/"
+libDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../lib/"
 
 source ${libDir}functions.sh
 
