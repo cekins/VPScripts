@@ -2,7 +2,10 @@
 
 # TODO: desc
 
-source "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/vpFunctions.sh"
+libDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/lib/"
+
+source ${libDir}functions.sh
+
 
 
 # Get screenshot directory
