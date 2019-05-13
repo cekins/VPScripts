@@ -21,9 +21,11 @@ do
 	for vpFile in $(getMatchingVPs $vpName)
 	do
 		# Print name of current comparison
-		echo ${vpFile#${vpDir}}
+		echo "${vpFile#${vpDir}}:"
 
 		# TODO make robust to names that start the same
+
+		echo -e "$(/opt/squish-6.4/bin/testvp --image "$vpFile" "junk" "$ssDir$ssFile")\n"
 
 		# Compare via utility
 		/opt/squish-6.4/bin/vpdiff "$vpFile" "junk" "$ssDir$ssFile"
