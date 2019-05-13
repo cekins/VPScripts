@@ -18,8 +18,11 @@ do
 	vpName=$(getVPName $ssFile)
 	vpDir=$(getVPDir)
 
-	for vpFile in $(getMatchingVPs $vpName)
+	echo "Here: $(getMatchingVPs $vpName)"
+
+	for vpFile in $(find "$vpDir" -name "${vpName}*")
 	do
+
 		# Print name of current comparison
 		echo ${vpFile#${vpDir}}
 

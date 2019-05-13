@@ -36,3 +36,9 @@ getVPName () {
 	vpName=${vpName%.png}		# remove suffix
 	echo "$vpName"
 }
+
+getMatchingVPs () {
+	local vpName=$1
+	local vpDir=$(getVPDir)
+	echo "$(find "$vpDir" -regex ".*/${vpName}\(_[0-9]+\)?$")"	
+}
