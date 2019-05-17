@@ -40,7 +40,7 @@ do
 	done
 
 	# Check if screenshot corresponds to verification points
-	if [[ $convertVP ]] && [[ -n $matchingVPs ]]
+	if  $convertVP  && [[ -n $matchingVPs ]]
 	then
 		# Prompt user for conversion
 		read -p "Convert image to VP (y/n)?" yn
