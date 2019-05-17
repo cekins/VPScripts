@@ -19,6 +19,16 @@ done
 # Get screenshot directory
 ssDir=$(getScreenshotDir)
 
+
+
+if $convertVP
+then
+	echo "Conversion Mode"
+fi
+
+
+
+	
 # Iterate over screenshots in folder
 for ssFile in $(ls "$ssDir")
 do
@@ -39,17 +49,17 @@ do
 	done
 
 	# Check if screenshot corresponds to verification points
-	if [ -z "$matchingVPs" ]
-	do
+	if [[ ! -z "$matchingVPs" && $convertVP ]]
+	then
 		# Prompt user for conversion
-		echo "Convert image to VP (y/n)?"
 		read -p "Convert image to VP (y/n)?" yn
 		case $yn in 
 			[Yy]* ) 
 				# Determine name for new vp 
-				hightestVP=$(matchingVPs[-1])
-			esac
-		done
+				hightestVP=${matchingVPs[0]}
+				echo $hightestVP
+				echo "END"
+		esac
 	fi	
 				
 
