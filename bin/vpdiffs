@@ -7,28 +7,19 @@ libDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../lib/"
 source ${libDir}functions.sh
 
 # Check for flags
-convertVp=false
+convertVP=false
 while getopts "c" argOpts
 do
 	case $argOpts in
 		c)
-			convertVp=true
+			convertVP=true
+			;;
 	esac
 done
 
 # Get screenshot directory
 ssDir=$(getScreenshotDir)
 
-
-
-if $convertVP
-then
-	echo "Conversion Mode"
-fi
-
-
-
-	
 # Iterate over screenshots in folder
 for ssFile in $(ls "$ssDir")
 do
@@ -49,7 +40,7 @@ do
 	done
 
 	# Check if screenshot corresponds to verification points
-	if [[ ! -z "$matchingVPs" && $convertVP ]]
+	if [[ $convertVP ]] && [[ -n $matchingVPs ]]
 	then
 		# Prompt user for conversion
 		read -p "Convert image to VP (y/n)?" yn
