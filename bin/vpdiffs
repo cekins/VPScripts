@@ -28,8 +28,10 @@ do
 	vpDir=$(getVPDir)
 
 	matchingVPs=$(getMatchingVPs $vpName)
+	matchingVPs=($(sort <<<"$matchingVPs"))
 
-	for vpFile in $matchingVPs
+
+	for vpFile in "${matchingVPs[@]}"
 	do
 		# Print name of current comparison
 		echo "${vpFile#${vpDir}}:"
@@ -39,17 +41,35 @@ do
 		/opt/squish-6.4/bin/vpdiff "$vpFile" "junk" "$ssDir$ssFile"
 	done
 
+
 	# Check if screenshot corresponds to verification points
 	if  $convertVP  && [[ -n $matchingVPs ]]
 	then
+
+		# Determine name for new vp 
+		highestVP=${matchingVPs[-1]}
+
+		# Check if string has underscore end
+		if [[ $highestVP =~ .*_[0-9]+$ ]]; then
+			newNumber=$((${highestVP##*_} + 1))
+		else
+			newNumber=1
+		fi
+
+		# Create new vp name
+		newVP="${matchingVPs[0]}_$newNumber"
+
+
 		# Prompt user for conversion
-		read -p "Convert image to VP (y/n)?" yn
+		read -p "Generate VP: ${newVP} (y/n)?" yn
 		case $yn in 
-			[Yy]* ) 
-				# Determine name for new vp 
-				hightestVP=${matchingVPs[0]}
-				echo $hightestVP
-				echo "END"
+			[Yy]* ) # Generate new vp
+				/opt/squish-6.4/bin/convertvp --tovp "$newVP" "$ssDir$ssFile" "WIDGET_NAME_PLACEHOLDER"
+
+				echo "New vp:"
+				echo $newVP
+				
+
 		esac
 	fi	
 				
