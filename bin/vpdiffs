@@ -7,17 +7,21 @@ libDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../lib/"
 source ${libDir}functions.sh
 
 # Extra variables
-helpMessage="Script for creating and comparing verification points.\n\nOptions:\n\t-h  help\n\t-c  compare\n"
+helpMessage="Script for creating and comparing verification points.\n\nOptions:\n\t-h  help\n\t-c  convert\n\t-d difference"
 
 # Colors
 RED='\e[0;31m'
 GRN='\e[0;32m'
-BLD='\e[1mBold'
+BLU='\e[0;34m'
+BLD='\e[1m'
 NC='\e[0m'
+
+HED=$BLU$BLD
 
 # Check for flags
 convertVP=false
-while getopts "hc" argOpts
+diffVP=false
+while getopts "hcd" argOpts
 do
 	case $argOpts in
 		h)
@@ -27,8 +31,14 @@ do
 		c)
 			convertVP=true
 			;;
+		d)	
+			diffVP=true
+			;;
 	esac
 done
+
+# Initialized Variables
+generatedVPs=()
 
 # Print extra space to separate command output
 printf "\n"
@@ -50,7 +60,7 @@ do
 	# Check if screenshot has corresponding vp
 	if [[ ${#matchingVPs[@]} != 0 ]]; then
 		# Print base name of vp
-		printf "${BLD}%s${NC}:\n\n" "${vpName}"
+		printf "${HED}%s${NC}:\n\n" "${vpName}"
 	fi
 
 	for vpFile in "${matchingVPs[@]}"
@@ -69,8 +79,10 @@ do
 		# Print comparison outpu
 		printf "\t${CLR}%s\n\t%s${NC}\n\n" "${vpFile#${vpDir}}" "${output}"
 
-		# Run visual comparison
-		/opt/squish-6.4/bin/vpdiff "$vpFile" "junk" "$ssDir$ssFile"
+		if $diffVP; then
+			# Run visual comparison
+			/opt/squish-6.4/bin/vpdiff "$vpFile" "junk" "$ssDir$ssFile"
+		fi	
 	done
 
 	# Check if screenshot corresponds to verification points
@@ -92,17 +104,43 @@ do
 
 
 		# Prompt user for conversion
-		read -p "Generate VP: ${newVP##*/} (y/n)?" yn
-		case $yn in 
-			[Yy]* ) # Generate new vp
-				/opt/squish-6.4/bin/convertvp --tovp "$newVP" "$ssDir$ssFile" "WIDGET_NAME_PLACEHOLDER"
+		prompt="(G)enerate ${newVP##*/}\n(V)isual Compare\n(N)ext VP\n"
 
-				printf "New VP generated"
-				
+		printf "$prompt"
+		while true; do
+			read -p "(g/v/n)?"  op 
+			case $op in 
+				[Gg]* ) # Generate new vp
+					/opt/squish-6.4/bin/convertvp --tovp "$newVP" "$ssDir$ssFile" "WIDGET_NAME_PLACEHOLDER"
 
-		esac
-		printf "\n\n"
+					# Add generated vp to list
+					generatedVPs+=("${newVP##*/}")
+					;;
+
+				[Vv]* ) # #Visual comparison
+					for vpFile in "${matchingVPs[@]}"
+					do
+						# Run visual comparison
+						/opt/squish-6.4/bin/vpdiff "$vpFile" "junk" "$ssDir$ssFile"
+					done
+					;;
+
+				[Nn]* ) # Next VP
+					break
+					;;
+
+				* ) # Invalid command
+					;;
+
+			esac
+		done
+		printf "\n"
 	fi	
-				
-
 done
+
+# List created vps
+
+if [[ ${#generatedVPs[@]} != 0 ]]; then
+	printf "${BLD}%s${NC}\n" "Generated VPs:" 
+	printf "\t%s\n" "${generatedVPs[@]}"
+fi
