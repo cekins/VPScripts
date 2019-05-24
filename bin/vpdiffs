@@ -6,11 +6,19 @@
 libDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/../lib/"
 source ${libDir}functions.sh
 
+# Extra variables
+helpMessage="Script for creating and comparing verification points.\n\nOptions:\n\t-h  help\n\t-c  compare\n"
+
+
 # Check for flags
 convertVP=false
-while getopts "c" argOpts
+while getopts "hc" argOpts
 do
 	case $argOpts in
+		h)
+			printf "$helpMessage"
+			exit 0
+			;;
 		c)
 			convertVP=true
 			;;
