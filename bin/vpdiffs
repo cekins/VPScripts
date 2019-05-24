@@ -9,6 +9,11 @@ source ${libDir}functions.sh
 # Extra variables
 helpMessage="Script for creating and comparing verification points.\n\nOptions:\n\t-h  help\n\t-c  compare\n"
 
+# Colors
+RED='\e[0;31m'
+GRN='\e[0;32m'
+BLD='\e[1mBold'
+NC='\e[0m'
 
 # Check for flags
 convertVP=false
@@ -25,6 +30,9 @@ do
 	esac
 done
 
+# Print extra space to separate command output
+printf "\n"
+
 # Get screenshot directory
 ssDir=$(getScreenshotDir)
 
@@ -35,20 +43,35 @@ do
 	vpName=$(getVPName $ssFile)
 	vpDir=$(getVPDir)
 
+	# Get matching vp files and sort them 
 	matchingVPs=$(getMatchingVPs $vpName)
 	matchingVPs=($(sort <<<"$matchingVPs"))
 
+	# Check if screenshot has corresponding vp
+	if [[ ${#matchingVPs[@]} != 0 ]]; then
+		# Print base name of vp
+		printf "${BLD}%s${NC}:\n\n" "${vpName}"
+	fi
 
 	for vpFile in "${matchingVPs[@]}"
 	do
-		# Print name of current comparison
-		echo "${vpFile#${vpDir}}:"
-		# Generate comparison percent 
-		echo -e "$(/opt/squish-6.4/bin/testvp --image "$vpFile" "junk" "$ssDir$ssFile")\n"
-		# Compare via utility
+		# Run comparison command
+		output=$(/opt/squish-6.4/bin/testvp --image "$vpFile" "junk" "$ssDir$ssFile")
+
+		# Test output to determine display color
+		if [[ $output == *"match"* ]]; then
+			
+			CLR=$GRN
+		else
+			CLR=$RED
+		fi
+		
+		# Print comparison outpu
+		printf "\t${CLR}%s\n\t%s${NC}\n\n" "${vpFile#${vpDir}}" "${output}"
+
+		# Run visual comparison
 		/opt/squish-6.4/bin/vpdiff "$vpFile" "junk" "$ssDir$ssFile"
 	done
-
 
 	# Check if screenshot corresponds to verification points
 	if  $convertVP  && [[ -n $matchingVPs ]]
@@ -69,16 +92,16 @@ do
 
 
 		# Prompt user for conversion
-		read -p "Generate VP: ${newVP} (y/n)?" yn
+		read -p "Generate VP: ${newVP##*/} (y/n)?" yn
 		case $yn in 
 			[Yy]* ) # Generate new vp
 				/opt/squish-6.4/bin/convertvp --tovp "$newVP" "$ssDir$ssFile" "WIDGET_NAME_PLACEHOLDER"
 
-				echo "New vp:"
-				echo $newVP
+				printf "New VP generated"
 				
 
 		esac
+		printf "\n\n"
 	fi	
 				
 
