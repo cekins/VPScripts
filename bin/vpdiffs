@@ -40,7 +40,7 @@ done
 printf "\n"
 
 ## Iterate over screenshots located in Test Results
-GENERATED_VPS=()
+GENERATED_VP_NAMES=()
 SCREENSHOT_DIR=$(getScreenshotDir)
 
 for SCREENSHOT_NAME in $(ls "$SCREENSHOT_DIR")
@@ -65,7 +65,7 @@ do
 		for VP_FILE in "${MATCHED_VP_FILES[@]}"
 		do
 			## Run script to compare VP
-			TESTVP_OUTPUT=$(/opt/squish-6.4/bin/testvp --image "$VP_FILE" "junk" "$SCREENSHOT_FILE")
+			TESTVP_OUTPUT=$(${TOOLS_DIR}testvp --image "$VP_FILE" "junk" "$SCREENSHOT_FILE")
 
 			## Print output of testvp command
 			if [[ $TESTVP_OUTPUT == *"match"* ]]
@@ -95,33 +95,29 @@ do
 
 		## Prompt user with menu options
 		MENU_PROMPT="(G)enerate ${NEW_VP_FILE##*/}\n(V)isual Compare\n(N)ext VP\n"
-
 		printf "$MENU_PROMPT"
-
-exit 0
 		while true; do
 			read -p "(g/v/n)?"  op 
 			case $op in 
-				[Gg]* ) # Generate new vp
-					${TOOLS_DIR}convertvp --tovp "$newVP" "$ssDir$ssFile" "WIDGET_NAME_PLACEHOLDER"
+				[Gg]* ) ## Use opt tools to generate a new VP from screenshot 
+					${TOOLS_DIR}convertvp --tovp "$NEW_VP_FILE" "$SCREENSHOT_FILE" "WIDGET_NAME_PLACEHOLDER"
 
-					# Add generated vp to list
-					generatedVPs+=("${newVP##*/}")
+					## Keep track of which VPs have been generated thus far in the script 
+					GENERATED_VP_NAMES+=("${NEW_VP_FILE##*/}")
 					;;
 
-				[Vv]* ) # #Visual comparison
-					for vpFile in "${matchingVPs[@]}"
+				[Vv]* ) ## Use opt tools to do a visual comparison of all matching VPs to the screenshot
+					for VP_FILE in "${MATCHED_VP_FILES[@]}"
 					do
-						# Run visual comparison
-						/opt/squish-6.4/bin/vpdiff "$vpFile" "junk" "$ssDir$ssFile"
+						${TOOLS_DIR}vpdiff "$VP_FILE" "junk" "$SCREENSHOT_FILE"
 					done
 					;;
 
-				[Nn]* ) # Next VP
+				[Nn]* ) ## Move on to the next screenshot
 					break
 					;;
 
-				* ) # Invalid command
+				* ) ## Invalid command was entered
 					;;
 
 			esac
@@ -130,9 +126,8 @@ exit 0
 	fi	
 done
 
-# List created vps
-
-if [[ ${#generatedVPs[@]} != 0 ]]; then
+## List the screenshots created by the script in the current run
+if [[ ${#GENERATED_VP_NAMES[@]} != 0 ]]; then
 	printf "${BLD}%s${NC}\n" "Generated VPs:" 
-	printf "\t%s\n" "${generatedVPs[@]}"
+	printf "\t%s\n" "${GENERATED_VP_NAMES[@]}"
 fi
