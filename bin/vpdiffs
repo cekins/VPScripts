@@ -23,7 +23,8 @@ HED=$BLU$BLD
 
 ## Parse flags
 DIFF_FLAG=false
-while getopts "hd" ARGOPTS
+JENKINS_FLAG=false
+while getopts "hdj:" ARGOPTS
 do
 	case $ARGOPTS in
 		h)
@@ -32,6 +33,10 @@ do
 			;;
 		d)	
 			DIFF_FLAG=true
+			;;
+		j)
+			JENKINS_FLAG=true
+			JENKINS_DIR="$OPTARG"
 			;;
 	esac
 done
@@ -94,7 +99,7 @@ do
 		NEW_VP_FILE="${VP_FILES[0]}_$NEW_VP_NUM"
 
 		## Prompt user with menu options
-		MENU_PROMPT="(G)enerate ${NEW_VP_FILE##*/}\n(V)isual Compare\n(N)ext VP\n"
+		MENU_PROMPT="(G)enerate ${NEW_VP_FILE##*/}\n(V)isual Compare\n(N)ext VP\n(Q)uit script\n\n"
 		printf "$MENU_PROMPT"
 		while true; do
 			read -p "(g/v/n)?"  op 
@@ -115,6 +120,10 @@ do
 
 				[Nn]* ) ## Move on to the next screenshot
 					break
+					;;
+		
+				[Qq]* ) ## Quit the script
+					exit 0
 					;;
 
 				* ) ## Invalid command was entered
