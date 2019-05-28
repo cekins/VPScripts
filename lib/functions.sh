@@ -3,6 +3,8 @@
 # This script contains functions for locating vp and screenshot
 # files that are use in other scripts
 
+# TODO add description, update variables names, add functions for using all tools
+
 getTimestampDir () {
 	local tsDir=~/.squish/Test\ Results/	# directory storing all results
 	tsDir="$tsDir$(ls "$tsDir" | tail -1)"	# directory for most recent timestamp
