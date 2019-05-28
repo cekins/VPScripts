@@ -55,14 +55,14 @@ do
 	VP_DIR=$(getVPDir)
 
 	## Get matching VPs and check that screenshot has VPs
-	MATCHED_VP_FILES=$(getMatchingVPs $VP_BASE)
-	MATCHED_VP_FILES=($(sort <<<"$MATCHED_VP_FILES"))
-	if [[ ${#MATCHED_VP_FILES[@]} != 0 ]]
+	VP_FILES=$(getMatchingVPs $VP_BASE)
+	VP_FILES=($(sort <<<"$VP_FILES"))
+	if [[ ${#VP_FILES[@]} != 0 ]]
 	then
 
 		## Iterate over matching VPs
 		printf "${HED}%s${NC}:\n\n" "${VP_BASE}"
-		for VP_FILE in "${MATCHED_VP_FILES[@]}"
+		for VP_FILE in "${VP_FILES[@]}"
 		do
 			## Run script to compare VP
 			TESTVP_OUTPUT=$(${TOOLS_DIR}testvp --image "$VP_FILE" "junk" "$SCREENSHOT_FILE")
@@ -84,14 +84,14 @@ do
 		done
 
 		## Determine name for new VP 
-		HIGHEST_VP_FILE=${MATCHED_VP_FILES[-1]}
+		HIGHEST_VP_FILE=${VP_FILES[-1]}
 		if [[ $HIGHEST_VP_FILE =~ .*_[0-9]+$ ]]
 		then
 			NEW_VP_NUM=$((${HIGHEST_VP_FILE##*_} + 1))
 		else
 			NEW_VP_NUM=1
 		fi
-		NEW_VP_FILE="${MATCHED_VP_FILES[0]}_$NEW_VP_NUM"
+		NEW_VP_FILE="${VP_FILES[0]}_$NEW_VP_NUM"
 
 		## Prompt user with menu options
 		MENU_PROMPT="(G)enerate ${NEW_VP_FILE##*/}\n(V)isual Compare\n(N)ext VP\n"
@@ -107,7 +107,7 @@ do
 					;;
 
 				[Vv]* ) ## Use opt tools to do a visual comparison of all matching VPs to the screenshot
-					for VP_FILE in "${MATCHED_VP_FILES[@]}"
+					for VP_FILE in "${VP_FILES[@]}"
 					do
 						${TOOLS_DIR}vpdiff "$VP_FILE" "junk" "$SCREENSHOT_FILE"
 					done
