@@ -4,6 +4,7 @@
 #### and filenames as well as running squish tools.
 
 # TODO  update variables names, add functions for using all tools, comment purpose of each function
+# 
 
 
 ## Test Results functions	
@@ -33,24 +34,24 @@ getVPDir () {
 	echo "$vpDir"
 }
 
-getVPName () {
-	local vpName=$1
-	local tcName=$(getTestCaseName)	
-	vpName=${vpName#${tcName}_}	# remove prefix
-	vpName=${vpName%.png}		# remove suffix
-	echo "$vpName"
-}
 
 
 
 ## Generic functions
 
-# TODO make this take another argument to make it generic
 getMatchingVPs () {
-	local vpName=$1
-	local vpDir=$(getVPDir)
-	echo "$(find "$vpDir" -regex ".*/${vpName}\(_[0-9]+\)?$" -print)"	
+	local VP_BASE=$1
+	local VP_DIR=$2
+	echo "$(find "$VP_DIR" -regex ".*/${VP_BASE}\(_[0-9]+\)?$" -print)"	
 }
+
+getVPName () {
+	local SCREENSHOT_NAME=$1
+	local TC_NAME=$2	
+	VP_NAME= sed -E 's/(-[1-9]+)?.png$//g' <<< ${SCREENSHOT_NAME#"${TC_NAME}_"}
+	echo "$VP_NAME"
+}
+
 
 
 

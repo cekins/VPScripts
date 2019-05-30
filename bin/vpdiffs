@@ -54,14 +54,16 @@ do
 	SCREENSHOT_FILE=$SCREENSHOT_DIR$SCREENSHOT_NAME
 
 	## Use screenshot names to get corresponding VP name
-	VP_BASE=$(getVPName $SCREENSHOT_NAME)
+	TC_NAME=$(getTestCaseName)
+	VP_BASE=$(getVPName $SCREENSHOT_NAME $TC_NAME)
 	
 	## Get directory containing VPs
 	VP_DIR=$(getVPDir)
 
 	## Get matching VPs and check that screenshot has VPs
-	VP_FILES=$(getMatchingVPs $VP_BASE)
+	VP_FILES=$(getMatchingVPs $VP_BASE $VP_DIR)
 	VP_FILES=($(sort <<<"$VP_FILES"))
+
 	if [[ ${#VP_FILES[@]} != 0 ]]
 	then
 
