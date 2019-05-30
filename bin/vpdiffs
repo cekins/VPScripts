@@ -43,22 +43,25 @@ done
 
 ## Print newline before start of script 
 printf "\n"
+if $JENKINS_FLAG
+then
+	DATA_DIR=$(getJenkinsDataDir $JENKINS_DIR)
+else
+	DATA_DIR=$(getDataDir)
+fi
+SCREENSHOT_DIR=$(getScreenshotDir "$DATA_DIR")
 
 ## Iterate over screenshots located in Test Results
 GENERATED_VP_NAMES=()
-SCREENSHOT_DIR=$(getScreenshotDir)
-
+# TODO replace this ls with something more robust
 for SCREENSHOT_NAME in $(ls "$SCREENSHOT_DIR")
 do
-	## Generate screenshot full path
-	SCREENSHOT_FILE=$SCREENSHOT_DIR$SCREENSHOT_NAME
 
-	## Use screenshot names to get corresponding VP name
-	TC_NAME=$(getTestCaseName)
-	VP_BASE=$(getVPName $SCREENSHOT_NAME $TC_NAME)
-	
-	## Get directory containing VPs
-	VP_DIR=$(getVPDir)
+	## Generate needed file names
+	SCREENSHOT_FILE=$SCREENSHOT_DIR$SCREENSHOT_NAME
+	TC_NAME=$(getTestCaseName "$DATA_DIR")
+	VP_BASE=$(getVPBase $SCREENSHOT_NAME $TC_NAME)
+	VP_DIR=$(getVPDir $TC_NAME)
 
 	## Get matching VPs and check that screenshot has VPs
 	VP_FILES=$(getMatchingVPs $VP_BASE $VP_DIR)

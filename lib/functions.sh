@@ -4,40 +4,43 @@
 #### and filenames as well as running squish tools.
 
 # TODO  update variables names, add functions for using all tools, comment purpose of each function
-# 
+# combine more of these functions into 
 
 
-## Test Results functions	
-getTimestampDir () {
-	local tsDir=~/.squish/Test\ Results/	# directory storing all results
-	tsDir="$tsDir$(ls "$tsDir" | tail -1)"	# directory for most recent timestamp
-	tsDir="$(find "$tsDir" -maxdepth 1 -mindepth 1 -type d | tail -1)/"
-	echo "$tsDir"
+## Non-Jenkins Functions
+
+getDataDir () {
+	local DATA_DIR=~/.squish/Test\ Results/	# directory storing all results
+	DATA_DIR="$DATA_DIR$(ls "$DATA_DIR" | tail -1)"	# directory for most recent timestamp
+	DATA_DIR="$(find "$DATA_DIR" -maxdepth 1 -mindepth 1 -type d | tail -1)/"
+	echo "$DATA_DIR"
+}
+
+
+
+## Jenkins Functions
+
+getJenkinsDataDir() {
+	local ARCHIVE_DIR=$1
+	echo "${ARCHIVE_DIR}/archive/out/data/"
+}
+
+
+
+## Generic Functions
+
+getScreenshotDir () {
+	local DATA_DIR=$1
+	local TC_NAME=$(getTestCaseName "$DATA_DIR")
+	local SS_DIR="${DATA_DIR}${TC_NAME}/screenshots/"
+	echo "$SS_DIR"
 }
 
 getTestCaseName () {
-	local tsDir=$(getTimestampDir)
-	local tcName="$(ls "$tsDir" | grep 'tst' | tail -1)" 
-	echo "$tcName"
+	local DATA_DIR=$1
+	local TC_NAME="$(ls "$DATA_DIR" | grep 'tst' | tail -1)" 
+	echo "$TC_NAME"
 }
-
-getScreenshotDir () {
-	local ssDir="$(getTimestampDir)$(getTestCaseName)/screenshots/"
-	echo "$ssDir"
-}
-
-getVPDir () {
-	local tcName=$(getTestCaseName)
-	local vpDir=~/Sources/rvc/AutomatedTests/suites/	# directory of suites
-	vpDir="$(find $vpDir -maxdepth 2 -mindepth 2 -type d -name $tcName)"	# directory of test case
-	vpDir="${vpDir}/verificationPoints/"
-	echo "$vpDir"
-}
-
-
-
-
-## Generic functions
 
 getMatchingVPs () {
 	local VP_BASE=$1
@@ -45,36 +48,21 @@ getMatchingVPs () {
 	echo "$(find "$VP_DIR" -regex ".*/${VP_BASE}\(_[0-9]+\)?$" -print)"	
 }
 
-getVPName () {
+getVPBase () {
 	local SCREENSHOT_NAME=$1
 	local TC_NAME=$2	
-	VP_NAME= sed -E 's/(-[1-9]+)?.png$//g' <<< ${SCREENSHOT_NAME#"${TC_NAME}_"}
+	local VP_NAME="$(sed -E 's/(-[1-9]+)?.png$//g' <<< ${SCREENSHOT_NAME#"${TC_NAME}_"})"
 	echo "$VP_NAME"
 }
 
-
-
-
-## Jenkins functions
-getJenkinsDataDir() {
-	local ARCHIVE_DIR=$1
-	echo "${ARCHIVE_DIR}/archive/out/data/"
-}
-
-getJenkinsTestCaseName () {
-	local ARCHIVE_DIR=$1
-	local DATA_DIR=$(getJenkinsDataDir $ARCHIVE_DIR)
-	local TEST_CASE_NAME="$(ls "$DATA_DIR" | grep 'tst' | tail -1)" 
-	echo "$TEST_CASE_NAME"
+getVPDir () {
+	local TC_NAME=$1
+	local SUITE_DIR=~/Sources/rvc/AutomatedTests/suites/	# directory of suites
+	local VP_DIR="$(find $SUITE_DIR -maxdepth 3 -mindepth 2 -type d -name $TC_NAME)"	# directory of test case
+	VP_DIR="${VP_DIR}/verificationPoints/"
+	echo "$VP_DIR"
 }
 
 
-getJenkinsScreenshotDir () {
-	local ARCHIVE_DIR=$1
-	local DATA_DIR=$(getJenkinsDataDir $ARCHIVE_DIR)
-	local TEST_CAST_NAME=$(getJenkinsTestCaseName $ARCHIVE_DIR)
-	local SS_DIR="${DATA_DIR}/${TEST_CASE_NAME}/${TEST_CASE_NAME}/"
-	echo "SS_DIR"
-}
 
 
