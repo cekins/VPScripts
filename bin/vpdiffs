@@ -17,6 +17,7 @@ HELP_MSG="Script for creating and comparing verification points.\n\nOptions:\n\t
 RED='\e[0;31m'
 GRN='\e[0;32m'
 BLU='\e[0;34m'
+WHT='\e[0;107m'
 BLD='\e[1m'
 NC='\e[0m'
 HED=$BLU$BLD
@@ -71,7 +72,7 @@ do
 	then
 
 		## Iterate over matching VPs
-		printf "${HED}%s${NC}:\n\n" "${VP_BASE}"
+		printf "${HED}%s / ${NC}%s :\n\n" "${VP_BASE}" "${SCREENSHOT_NAME}"
 		for VP_FILE in "${VP_FILES[@]}"
 		do
 			## Run script to compare VP
@@ -107,7 +108,7 @@ do
 		MENU_PROMPT="(G)enerate ${NEW_VP_FILE##*/}\n(V)isual Compare\n(N)ext VP\n(Q)uit script\n\n"
 		printf "$MENU_PROMPT"
 		while true; do
-			read -p "(g/v/n)?"  op 
+			read -p "(g/v/n/q)?"  op 
 			case $op in 
 				[Gg]* ) ## Use opt tools to generate a new VP from screenshot 
 					${TOOLS_DIR}convertvp --tovp "$NEW_VP_FILE" "$SCREENSHOT_FILE" "WIDGET_NAME_PLACEHOLDER"
