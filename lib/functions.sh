@@ -3,11 +3,9 @@
 #### vpdiffs script. Functions related to locating directories
 #### and filenames as well as running squish tools.
 
-# TODO  update variables names, add functions for using all tools, comment purpose of each function
-# combine more of these functions into 
 
 
-## Non-Jenkins Functions
+########## Non-Jenkins Functions ##########
 
 getDataDir () {
 	local DATA_DIR=~/.squish/Test\ Results/	# directory storing all results
@@ -18,7 +16,7 @@ getDataDir () {
 
 
 
-## Jenkins Functions
+########## Jenkins Functions ##########
 
 getJenkinsDataDir() {
 	local ARCHIVE_DIR=$1
@@ -27,7 +25,11 @@ getJenkinsDataDir() {
 
 
 
-## Generic Functions
+########## Tool Functions ##########
+
+
+
+########## Generic Functions ##########
 
 getScreenshotDir () {
 	local DATA_DIR=$1
